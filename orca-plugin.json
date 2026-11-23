@@ -1,0 +1,61 @@
+{
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "id": "nvm-manager",
+  "name": "NVM Manager",
+  "version": "0.1.0",
+  "description": "Control nvm (Node Version Manager) from Orca's sidebar: see the Node.js version pinned by the focused workspace's .nvmrc, pin another one, install, uninstall and set the default version.",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "screenshots": [
+    {
+      "path": "assets/screenshots/panel.png",
+      "alt": "NVM panel showing the focused workspace, installed Node.js versions with Pin, Default and Uninstall, and Node.js release lines",
+      "caption": "Pinned version, installed versions and Node.js releases",
+      "theme": "dark"
+    }
+  ],
+  "engines": {
+    "orca": ">=1.4.247"
+  },
+  "pluginApi": 1,
+  "main": "worker/main.mjs",
+  "contributes": {
+    "panels": [
+      {
+        "id": "nvm",
+        "title": "NVM",
+        "icon": "package",
+        "entry": "panel/index.html"
+      }
+    ],
+    "settings": [
+      {
+        "key": "nvmDir",
+        "title": "NVM directory",
+        "description": "Leave empty to use $NVM_DIR or ~/.nvm. Set it if nvm lives somewhere else.",
+        "type": "string",
+        "default": "",
+        "placeholder": "~/.nvm"
+      },
+      {
+        "key": "installAfterPin",
+        "title": "Install when pinning",
+        "description": "Run nvm install after writing .nvmrc if that version isn't installed yet.",
+        "type": "boolean",
+        "default": true
+      }
+    ]
+  },
+  "capabilities": [
+    {
+      "kind": "workspace:read"
+    },
+    {
+      "kind": "settings:own"
+    },
+    {
+      "kind": "notifications:show"
+    }
+  ]
+}
