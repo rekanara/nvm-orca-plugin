@@ -173,6 +173,8 @@
       let status = null
       let channel = 'lts'
       let busy = false
+      // nvm-windows has no default alias: its "default" is the system-wide active version (nvm use).
+      const isWin = () => !!(status && status.platform === 'win32')
 
       function el(tag, props, ...children) {
         const node = document.createElement(tag)
@@ -202,6 +204,7 @@
       }
 
       async function run(action, version) {
+        if (action === 'default' && isWin() && !confirm(`Switch this computer to Node.js ${version}? nvm-windows may ask for administrator access.`)) return
         if (action === 'uninstall' && !confirm(`Uninstall Node.js ${version}? Its global npm packages go with it.`)) return
         try {
           await plugin.request('nvm.run', { action, version }, { timeoutMs: 15000 })
@@ -237,7 +240,9 @@
             : ws ? 'Choose a version below and press Pin to write .nvmrc here' : ''
         }
         if (status && status.ok) {
-          const d = status.defaultVersion ? `Default ${status.defaultVersion}` : 'No default set'
+          const d = status.defaultVersion
+            ? `${isWin() ? 'Active' : 'Default'} ${status.defaultVersion}`
+            : isWin() ? 'No active version' : 'No default set'
           $('pinSub').textContent += ($('pinSub').textContent ? '. ' : '') + d + (status.nvmVersion ? `. nvm ${status.nvmVersion}` : '')
         }
       }
@@ -255,11 +260,11 @@
           const name = el('div', { className: 'name' },
             el('span', { className: 'v', textContent: v }),
             v === pinned ? el('span', { className: 'tag on', textContent: 'this project' }) : null,
-            v === status.defaultVersion ? el('span', { className: 'tag', textContent: 'default' }) : null
+            v === status.defaultVersion ? el('span', { className: 'tag', textContent: isWin() ? 'active' : 'default' }) : null
           )
           const actions = el('div', { className: 'actions' })
           if (v !== pinned && canPin()) actions.append(button('Pin', () => run('pin', v), 'primary'))
-          if (v !== status.defaultVersion) actions.append(button('Default', () => run('default', v)))
+          if (v !== status.defaultVersion) actions.append(button(isWin() ? 'Use' : 'Default', () => run('default', v)))
           actions.append(button('Uninstall', () => run('uninstall', v), 'danger'))
           return el('li', {}, name, actions)
         }))
@@ -275,7 +280,7 @@
             const name = el('div', { className: 'name' },
               el('span', { className: 'v', textContent: r.version }),
               installed.has(r.version) ? el('span', { className: 'tag', textContent: 'installed' }) : null,
-              el('div', { className: 'd', textContent: r.lts ? `LTS ${r.lts}` : 'Current' })
+              el('div', { className: 'd', textContent: r.label })
             )
             const actions = el('div', { className: 'actions' })
             if (!installed.has(r.version)) actions.append(button('Install', () => run('install', r.version)))
@@ -312,7 +317,7 @@
       }
       function showJob(job) {
         $('job').hidden = false
-        $('jobTitle').textContent = `${TITLES[job.action] || job.action} ${job.version}`
+        $('jobTitle').textContent = `${(job.action === 'default' && isWin() ? 'nvm use' : TITLES[job.action] || job.action)} ${job.version}`
         const state = $('jobState')
         state.className = `state ${job.state}`
         state.textContent = job.state === 'running' ? 'Running' : job.state === 'done' ? 'Done' : 'Failed'

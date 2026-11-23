@@ -12,7 +12,7 @@ repository only accepts plugins Stably maintains.
 | Path | What it is |
 | --- | --- |
 | `orca-plugin.json` | Manifest. The **only** place the version number lives. |
-| `worker/main.mjs` | Trusted worker: sources `nvm.sh` with one fixed bash script and passes fixed `nvm` arguments as positional parameters. |
+| `worker/main.mjs` | Trusted worker: sources `nvm.sh` with one fixed bash script and passes fixed `nvm` arguments as positional parameters; on Windows starts `nvm.exe` directly. |
 | `panel/index.html` | Sidebar panel (plain HTML/JS, no build step). |
 
 No build step and no dependencies. Keep it that way unless there is a real need.
@@ -30,7 +30,7 @@ orca plugin logs local.nvm-manager
 
 - **No shell, no command lines from the panel.** The panel sends an action name plus a version.
   The worker allows only the actions in `ACTIONS`, checks the version against `VERSION_RE` (`vX.Y.Z`), and
-  runs `bash -c <fixed script> nvm ...args` with `spawn`. Never build a command string from panel input.
+  runs `bash -c <fixed script> nvm ...args` (Windows: `nvm.exe ...args`) with `spawn`, never a shell. Never build a command string from panel input.
 - **Only change local workspaces.** Workspaces on SSH or paired hosts are shown but never changed.
 - **No tracking, analytics or network calls** of our own. Only `nvm` talks to the network.
 - **No minified or obfuscated code** (this is required by the Orca listing policy).

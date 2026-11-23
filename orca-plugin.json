@@ -4,7 +4,7 @@
   "id": "nvm-manager",
   "name": "NVM Manager",
   "version": "0.1.0",
-  "description": "Control nvm (Node Version Manager) from Orca's sidebar: see the Node.js version pinned by the focused workspace's .nvmrc, pin another one, install, uninstall and set the default version.",
+  "description": "Control nvm (Node Version Manager) on macOS, Linux and Windows (nvm-windows) from Orca's sidebar: see the Node.js version pinned by the focused workspace's .nvmrc, pin another one, install, uninstall and set the default version.",
   "license": "MIT",
   "icon": "assets/icon.png",
   "screenshots": [
@@ -33,7 +33,7 @@
       {
         "key": "nvmDir",
         "title": "NVM directory",
-        "description": "Leave empty to use $NVM_DIR or ~/.nvm. Set it if nvm lives somewhere else.",
+        "description": "Leave empty to use $NVM_DIR or ~/.nvm (Windows: %NVM_HOME%). Set it if nvm lives somewhere else.",
         "type": "string",
         "default": "",
         "placeholder": "~/.nvm"
